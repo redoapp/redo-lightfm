@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from lightfm.data import Dataset
+from redo_lightfm.data import Dataset
 
 
 def test_fitting():

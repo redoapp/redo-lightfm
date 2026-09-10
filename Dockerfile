@@ -14,7 +14,7 @@ RUN conda install pytest jupyter scikit-learn
 
 ENV PYTHONDONTWRITEBYTECODE 1
 
-ADD . /home/lightfm/
+ADD . /home/redo-lightfm/
 WORKDIR /home/
 
-RUN cd lightfm && pip install -e .
+RUN cd redo-lightfm && pip install -e .

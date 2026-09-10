@@ -26,16 +26,16 @@ def define_extensions(use_openmp):
         print("Compiling without OpenMP support.")
         return [
             Extension(
-                "lightfm._lightfm_fast_no_openmp",
-                ["lightfm/_lightfm_fast_no_openmp.c"],
+                "redo_lightfm._lightfm_fast_no_openmp",
+                ["redo_lightfm/_lightfm_fast_no_openmp.c"],
                 extra_compile_args=compile_args,
             )
         ]
     else:
         return [
             Extension(
-                "lightfm._lightfm_fast_openmp",
-                ["lightfm/_lightfm_fast_openmp.c"],
+                "redo_lightfm._lightfm_fast_openmp",
+                ["redo_lightfm/_lightfm_fast_openmp.c"],
                 extra_link_args=["-fopenmp"],
                 extra_compile_args=compile_args + ["-fopenmp"],
             )
@@ -97,7 +97,7 @@ class Cythonize(Command):
             ),
         )
 
-        file_dir = os.path.join(os.path.dirname(__file__), "lightfm")
+        file_dir = os.path.join(os.path.dirname(__file__), "redo_lightfm")
 
         with open(os.path.join(file_dir, "_lightfm_fast.pyx.template"), "r") as fl:
             template = fl.read()
@@ -119,12 +119,12 @@ class Cythonize(Command):
         cythonize(
             [
                 Extension(
-                    "lightfm._lightfm_fast_no_openmp",
-                    ["lightfm/_lightfm_fast_no_openmp.pyx"],
+                    "redo_lightfm._lightfm_fast_no_openmp",
+                    ["redo_lightfm/_lightfm_fast_no_openmp.pyx"],
                 ),
                 Extension(
-                    "lightfm._lightfm_fast_openmp",
-                    ["lightfm/_lightfm_fast_openmp.pyx"],
+                    "redo_lightfm._lightfm_fast_openmp",
+                    ["redo_lightfm/_lightfm_fast_openmp.pyx"],
                     extra_link_args=["-fopenmp"],
                 ),
             ],
@@ -153,16 +153,16 @@ class Clean(Command):
         pth = os.path.dirname(os.path.abspath(__file__))
 
         subprocess.call(["rm", "-rf", os.path.join(pth, "build")])
-        subprocess.call(["rm", "-rf", os.path.join(pth, "lightfm.egg-info")])
-        subprocess.call(["find", pth, "-name", "lightfm*.pyc", "-type", "f", "-delete"])
-        subprocess.call(["rm", os.path.join(pth, "lightfm", "_lightfm_fast.so")])
+        subprocess.call(["rm", "-rf", os.path.join(pth, "redo_lightfm.egg-info")])
+        subprocess.call(["find", pth, "-name", "redo_lightfm*.pyc", "-type", "f", "-delete"])
+        subprocess.call(["rm", os.path.join(pth, "redo_lightfm", "_lightfm_fast.so")])
 
 
 def read_version():
     mod = {}
     path = os.path.join(
         os.path.dirname(__file__),
-        "lightfm",
+        "redo_lightfm",
         "version.py",
     )
     with open(path) as fd:
@@ -177,14 +177,14 @@ use_openmp = not sys.platform.startswith("darwin") and not sys.platform.startswi
 long_description = pathlib.Path(__file__).parent.joinpath("README.md").read_text()
 
 setup(
-    name="lightfm",
+    name="redo-lightfm",
     version=read_version(),
     description="LightFM recommendation model",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/lyst/lightfm",
-    download_url="https://github.com/lyst/lightfm/tarball/{}".format(read_version()),
-    packages=["lightfm", "lightfm.datasets"],
+    url="https://github.com/redoapp/redo-lightfm",
+    download_url="https://github.com/redoapp/redo-lightfm/tarball/{}".format(read_version()),
+    packages=["redo_lightfm", "redo_lightfm.datasets"],
     package_data={"": ["*.c"]},
     install_requires=["numpy", "scipy>=0.17.0", "requests", "scikit-learn"],
     tests_require=["pytest", "requests", "scikit-learn"],
