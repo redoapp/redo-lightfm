@@ -16,11 +16,7 @@ def define_extensions(use_openmp):
         if sys.platform.startswith("darwin"):
             compile_args += []
         else:
-            compile_args += ["-march=native"]
-    
-    # Add Python 3.11+ compatibility flags
-    if sys.version_info >= (3, 11):
-        compile_args += ["-DPy_LIMITED_API=0x030B0000"]
+            compile_args += ["-march={}".format(os.environ.get("LIGHTFM_MARCH", "native"))]
 
     if not use_openmp:
         print("Compiling without OpenMP support.")
