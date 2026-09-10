@@ -1,0 +1,64 @@
+name: Release wheels
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build-wheels:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Read the version
+        id: version
+        run: |
+          echo "version=$(python3 -c 'exec(open("redo_lightfm/version.py").read()); print(__version__)')" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether the release already exists
+        id: existing
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build wheels
+        if: steps.existing.outputs.exists == 'false'
+        uses: pypa/cibuildwheel@v4.2.1
+        env:
+          CIBW_ARCHS_LINUX: x86_64
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          CIBW_MUSLLINUX_X86_64_IMAGE: musllinux_1_2
+          CIBW_ENVIRONMENT: LIGHTFM_MARCH=x86-64
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_TEST_COMMAND: >-
+            cp -r {project}/tests . &&
+            pytest tests/test_api.py tests/test_data.py
+            tests/test_evaluation.py tests/test_fast_functions.py
+
+      - uses: actions/upload-artifact@v7
+        if: steps.existing.outputs.exists == 'false'
+        with:
+          name: wheels
+          path: wheelhouse/*.whl
+
+      - name: Create the release
+        if: steps.existing.outputs.exists == 'false'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.version.outputs.version }}" \
+            --target "$GITHUB_SHA" \
+            --generate-notes \
+            wheelhouse/*.whl
