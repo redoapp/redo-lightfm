@@ -4,7 +4,7 @@ import numpy as np
 
 import scipy.sparse as sp
 
-from lightfm.datasets import fetch_movielens, fetch_stackexchange
+from redo_lightfm.datasets import fetch_movielens, fetch_stackexchange
 
 
 def test_basic_fetching_movielens():

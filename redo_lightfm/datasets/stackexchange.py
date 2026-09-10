@@ -4,7 +4,7 @@ import numpy as np
 
 import scipy.sparse as sp
 
-from lightfm.datasets import _common
+from redo_lightfm.datasets import _common
 
 
 def fetch_stackexchange(

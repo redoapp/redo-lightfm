@@ -8,9 +8,9 @@ from scipy import stats
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import KFold, RandomizedSearchCV
 
-from lightfm.lightfm import LightFM
-from lightfm.datasets import fetch_movielens
-from lightfm.evaluation import auc_score, precision_at_k
+from redo_lightfm.lightfm import LightFM
+from redo_lightfm.datasets import fetch_movielens
+from redo_lightfm.evaluation import auc_score, precision_at_k
 
 
 SEED = 10

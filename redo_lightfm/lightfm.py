@@ -5,6 +5,8 @@ import numpy as np
 
 import scipy.sparse as sp
 
+from sklearn.base import BaseEstimator
+
 from ._lightfm_fast import (
     CSRMatrix,
     FastLightFM,
@@ -21,7 +23,7 @@ __all__ = ["LightFM"]
 CYTHON_DTYPE = np.float32
 
 
-class LightFM(object):
+class LightFM(BaseEstimator):
     """
     A hybrid latent representation recommender model.
 

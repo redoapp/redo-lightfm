@@ -3,7 +3,7 @@ import numpy as np
 import scipy.sparse as sp
 
 
-from lightfm import _lightfm_fast
+from redo_lightfm import _lightfm_fast
 
 
 def test_in_positives():

@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.18][2026-09-10]
+
+### Added
+
+- Prebuilt Linux x86_64 wheels for Python 3.11, 3.12 and 3.13, attached to each
+  GitHub release.
+
+### Changed
+
+- Renamed the distribution to `redo-lightfm` and the package to `redo_lightfm`.
+- The `-march` compiler flag is set per build through the `LIGHTFM_MARCH`
+  environment variable instead of being hardcoded to `-march=native`.
+- `LightFM` now inherits `sklearn.base.BaseEstimator`, required by scikit-learn
+  1.6 and later for use with its cross-validation and search utilities.
+
+### Fixed
+
+- Re-Cythonized with Cython 3.x and declared `noexcept` on the `qsort`
+  comparison callbacks, so the extension builds on Python 3.11 and later.
+- Removed the `Py_LIMITED_API` compile flag, which built the extension against
+  an untested limited-API code path.
+
 ## [1.17][2023-03-19]
 
 ### Fixed

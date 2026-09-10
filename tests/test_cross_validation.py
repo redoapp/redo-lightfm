@@ -1,7 +1,7 @@
 import pytest
 
-from lightfm.cross_validation import random_train_test_split
-from lightfm.datasets import fetch_movielens
+from redo_lightfm.cross_validation import random_train_test_split
+from redo_lightfm.datasets import fetch_movielens
 
 
 def _assert_disjoint(x, y):
