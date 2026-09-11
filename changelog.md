@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.18.1][2026-09-11]
+
+### Fixed
+
+- Prebuilt wheels failed to import on glibc 2.31 and newer (Debian 11+,
+  Ubuntu 20.04+) with `undefined symbol: __log_finite`. `-ffast-math` implied
+  `-ffinite-math-only`, which on the older glibc of the manylinux build image
+  bound `log()`/`exp()` to the since-removed `__*_finite` aliases. The
+  extension is now compiled with `-fno-finite-math-only`.
+- When neither compiled extension can be imported, the error from the OpenMP
+  extension is raised instead of a misleading `ModuleNotFoundError` for the
+  no-OpenMP fallback.
+
 ## [1.18][2026-09-10]
 
 ### Added

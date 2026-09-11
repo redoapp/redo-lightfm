@@ -11,7 +11,8 @@ from setuptools import Command, Extension, setup
 def define_extensions(use_openmp):
     compile_args = []
     if not os.environ.get("LIGHTFM_NO_CFLAGS"):
-        compile_args += ["-ffast-math"]
+        # glibc < 2.31 maps log/exp to __*_finite under -ffinite-math-only; removed in 2.31
+        compile_args += ["-ffast-math", "-fno-finite-math-only"]
 
         if sys.platform.startswith("darwin"):
             compile_args += []
