@@ -1,0 +1,57 @@
+release:
+  stage: release
+  image: python:3.12
+  when: manual
+  resource_group: release
+  services:
+    - name: docker:dind
+      entrypoint: ["env", "-u", "DOCKER_HOST"]
+      command: ["dockerd-entrypoint.sh"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+    CIBW_ARCHS_LINUX: x86_64
+    CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+    CIBW_MUSLLINUX_X86_64_IMAGE: musllinux_1_2
+    CIBW_ENVIRONMENT: LIGHTFM_MARCH=x86-64
+    CIBW_TEST_REQUIRES: pytest
+    CIBW_TEST_COMMAND: >-
+      cp -r {project}/tests . &&
+      pytest tests/test_api.py tests/test_data.py
+      tests/test_evaluation.py tests/test_fast_functions.py
+    GLAB_ENABLE_CI_AUTOLOGIN: "true"
+    GLAB_VERSION: "1.85.3"
+  before_script:
+    - curl -fsSL "https://gitlab.com/gitlab-org/cli/-/releases/v${GLAB_VERSION}/downloads/glab_${GLAB_VERSION}_linux_amd64.tar.gz" | tar -xz
+    - mv bin/glab /usr/local/bin/glab
+    - glab --version
+  script:
+    - |
+      set -euo pipefail
+      VERSION="$(python3 -c 'exec(open("redo_lightfm/version.py").read()); print(__version__)')"
+      git fetch --tags --force
+      if git rev-parse "refs/tags/${VERSION}" >/dev/null 2>&1; then
+        TAGGED="$(git show "${VERSION}:redo_lightfm/version.py" | python3 -c 'import sys; exec(sys.stdin.read()); print(__version__)')"
+        if [ "$TAGGED" != "$VERSION" ]; then
+          echo "tag ${VERSION} has version.py ${TAGGED}"
+          exit 1
+        fi
+      fi
+      if glab release view "$VERSION" >/dev/null 2>&1; then
+        echo "GitLab release ${VERSION} already exists"
+        mkdir -p wheelhouse
+        exit 0
+      fi
+      curl -sSL https://get.docker.com/ | sh
+      python -m pip install --upgrade pip
+      python -m pip install cibuildwheel==4.2.1
+      cibuildwheel --output-dir wheelhouse
+      glab release create "$VERSION" \
+        --ref "$CI_COMMIT_SHA" \
+        --notes "Linux wheels for ${VERSION}" \
+        wheelhouse/*.whl
+  artifacts:
+    paths:
+      - wheelhouse/
+    expire_in: 1 week
