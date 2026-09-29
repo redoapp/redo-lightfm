@@ -1,0 +1,15 @@
+stages:
+  - test
+  - release
+
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+
+include:
+  - local: gitlab/workflows/test.yml
+  - local: gitlab/workflows/release.yml

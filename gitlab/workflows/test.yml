@@ -1,0 +1,36 @@
+.test:
+  stage: test
+  interruptible: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
+  script:
+    - python -m pip install --upgrade pip
+    - pip install flake8 pytest
+    - flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+    - flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - pip install -e .
+    - pytest
+
+test:linux:
+  extends: .test
+  image: python:${PYTHON_VERSION}
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.11", "3.12", "3.13"]
+
+test:macos:
+  extends: .test
+  tags:
+    - saas-macos-medium-m1
+  image: macos-26-xcode-26
+  variables:
+    HOMEBREW_NO_AUTO_UPDATE: "1"
+  before_script:
+    - brew install "python@${PYTHON_VERSION}"
+    - export PATH="$(brew --prefix python@${PYTHON_VERSION})/libexec/bin:$PATH"
+    - python --version
+    - python -m venv .venv
+    - source .venv/bin/activate
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.11", "3.12", "3.13"]
