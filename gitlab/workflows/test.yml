@@ -29,8 +29,8 @@ test:macos:
     - brew install "python@${PYTHON_VERSION}"
     - export PATH="$(brew --prefix python@${PYTHON_VERSION})/libexec/bin:$PATH"
     - python --version
-    - python -m venv .venv
-    - source .venv/bin/activate
+    - python -m venv "$HOME/ci-venv"
+    - source "$HOME/ci-venv/bin/activate"
   parallel:
     matrix:
       - PYTHON_VERSION: ["3.11", "3.12", "3.13"]
